@@ -1,20 +1,40 @@
 import fs from "fs";
 
+// Clase ProductManager para manejar los productos del archivo JSON (productos.json)
+// Esta clase tiene los métodos para agregar, obtener, actualizar y eliminar productos
 class ProductManager {
   constructor(path) {
     this.path = path;
   }
 
+  // Método para agregar un producto a la lista de productos (products) del archivo JSON (productos.json)
   async addProduct(product) {
     const products = await this.getProducts();
+
+    if (products.some((p) => p.code === product.code)) {
+      console.log("Error: El código del producto ya existe");
+      return -1;
+    }
+
     const lastProduct = products[products.length - 1];
     const newId = lastProduct ? lastProduct.id + 1 : 1;
-    const newProduct = { ...product, id: newId };
+    const newProduct = {
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      thumbnail: product.thumbnail || [],
+      code: product.code,
+      stock: product.stock,
+      category: product.category,
+      status: true,
+      id: newId,
+    };
     products.push(newProduct);
     await this.#saveProducts(products);
     return newProduct;
   }
 
+  // Método para obtener todos los productos de la lista de productos (products) del archivo JSON (productos.json)
   async getProducts() {
     try {
       const products = await fs.promises.readFile(this.path, "utf-8");
@@ -28,6 +48,7 @@ class ProductManager {
     }
   }
 
+  // Método para obtener un producto por su id (pid) de la lista de productos (products) del archivo JSON (productos.json)
   async getProductById(id) {
     const products = await this.getProducts();
     const product = products.find((product) => product.id === id);
@@ -37,23 +58,35 @@ class ProductManager {
     return product;
   }
 
+  // Método para actualizar un producto por su id (pid) de la lista de productos (products) del archivo JSON (productos.json)
   async updateProduct(id, update) {
     const products = await this.getProducts();
     const index = products.findIndex((product) => product.id === id);
     if (index === -1) {
-      return null;
+      return index;
     }
-    const updatedProduct = { ...products[index], ...update, id };
+    const updatedProduct = {
+      title: update.title || products[index].title,
+      description: update.description || products[index].description,
+      price: update.price || products[index].price,
+      thumbnail: update.thumbnail || products[index].thumbnail,
+      code: update.code || products[index].code,
+      stock: update.stock || products[index].stock,
+      category: update.category || products[index].category,
+      status: update.status || products[index].status,
+      id: id,
+    };
     products.splice(index, 1, updatedProduct);
     await this.#saveProducts(products);
     return updatedProduct;
   }
 
+  // Método para eliminar un producto por su id (pid) de la lista de productos (products) del archivo JSON (productos.json)
   async deleteProduct(id) {
     const products = await this.getProducts();
     const index = products.findIndex((product) => product.id === id);
     if (index === -1) {
-      return null;
+      return index;
     }
     products.splice(index, 1);
     await this.#saveProducts(products);
@@ -66,68 +99,3 @@ class ProductManager {
 }
 
 export default ProductManager;
-
-//Path: productos.json e instancia el objeto
-const productManager = new ProductManager("./productos.json");
-
-//Funcion para probar el CRUD
-async function prueba() {
-  //Agregar un producto
-  const product1 = {
-    title: "producto prueba",
-    description: "este es un producto prueba",
-    price: 200,
-    thumbnail: "sin imagen",
-    code: "abc123",
-    stock: 25,
-  };
-  const product2 = {
-    title: "producto prueba2",
-    description: "este es un producto prueba",
-    price: 200,
-    thumbnail: "sin imagen",
-    code: "abc123",
-    stock: 25,
-  };
-
-  await productManager.addProduct(product1);
-  await productManager.addProduct(product2);
-
-  // Consultar todos los productos
-  console.log("Todos los productos:\n", await productManager.getProducts());
-
-  // Consultar un producto por id
-  const productById = await productManager.getProductById(1);
-  if (!productById) {
-    console.log("No existe un producto con ese id");
-  } else {
-    console.log("Producto por id:\n", productById);
-  }
-
-  //Actualizar un producto
-  const updatedProduct = {
-    title: "Producto actualizado",
-    description: "Descripción actualizada del producto",
-    price: 100,
-  };
-  const productUpdated = await productManager.updateProduct(1, updatedProduct);
-  if (!productUpdated) {
-    console.log("No existe un producto con ese id");
-  } else {
-    console.log("Producto actualizado:\n", productUpdated);
-  }
-
-  // Eliminar un producto
-  const deletedProductId = await productManager.deleteProduct(2);
-  if (!deletedProductId) {
-    console.log("No existe un producto con ese id");
-  } else {
-    console.log("ID Producto eliminado:", deletedProductId);
-  }
-
-  // Consultar todos los productos después de eliminar uno
-  console.log("Productos restantes:\n", await productManager.getProducts());
-}
-
-//Ejecuto la funcion
-// prueba();
