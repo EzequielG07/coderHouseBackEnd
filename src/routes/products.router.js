@@ -1,11 +1,12 @@
 import { Router } from "express";
 import ProductManager from "../ProductManager.js";
+import { __dirname } from "../utils/dirname.js";
 
 // importamos el manejador de productos para poder usarlo en los endpoints de la API de productos (REST)
 const router = Router();
 
 // Creamos una instancia del manejador de productos para poder usarla en los endpoints de la API de productos (REST)
-const productManager = new ProductManager("./productos.json");
+const productManager = new ProductManager(__dirname + "/productos.json");
 
 // Endpoint para obtener todos los productos (o los primeros N productos si se pasa el parámetro limit en la query string)
 router.get("/", async (req, res) => {
@@ -16,15 +17,13 @@ router.get("/", async (req, res) => {
 
     if (limit) {
       const limitedProducts = products.slice(0, limit);
-      res.status(200).send({ status: "success", payload: limitedProducts });
+      res.json(limitedProducts);
     } else {
-      res.status(200).send({ status: "success", payload: products });
+      res.json(products);
     }
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al obtener los productos" });
+    res.status(500).json({ error: "Error al obtener los productos" });
   }
 });
 
@@ -36,17 +35,13 @@ router.get("/:pid", async (req, res) => {
     const product = await productManager.getProductById(parseInt(pid));
 
     if (product) {
-      res.status(200).send({ status: "success", payload: product });
+      res.json(product);
     } else {
-      res
-        .status(404)
-        .send({ status: "error", error: "Producto no encontrado" });
+      res.status(404).json({ error: "Producto no encontrado" });
     }
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al obtener el producto" });
+    res.status(500).json({ error: "Error al obtener el producto" });
   }
 });
 
@@ -62,24 +57,18 @@ router.post("/", async (req, res) => {
       !product.stock ||
       !product.category
     ) {
-      res
-        .status(400)
-        .send({ status: "error", error: "Todos los campos son obligatorios" });
+      res.status(400).json({ error: "Todos los campos son obligatorios" });
       return;
     }
     const b = await productManager.addProduct(product);
     if (b === -1) {
-      res
-        .status(400)
-        .send({ status: "error", error: "El código del producto ya existe" });
+      res.status(400).json({ error: "El código del producto ya existe" });
       return;
     }
-    res.status(201).send({ status: "success", payload: b });
+    res.status(201).json("Producto agregado");
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al agregar el producto" });
+    res.status(500).json({ error: "Error al agregar el producto" });
   }
 });
 
@@ -93,17 +82,13 @@ router.put("/:pid", async (req, res) => {
       product
     );
     if (updatedProduct === -1) {
-      res
-        .status(404)
-        .send({ status: "error", error: "Producto no encontrado" });
+      res.status(404).json({ error: "Producto no encontrado" });
       return;
     }
-    res.status(201).send({ status: "success", payload: updatedProduct });
+    res.status(201).json("Producto actualizado");
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al actualizar el producto" });
+    res.status(500).json({ error: "Error al actualizar el producto" });
   }
 });
 
@@ -113,17 +98,13 @@ router.delete("/:pid", async (req, res) => {
     const { pid } = req.params;
     const deletedProduct = await productManager.deleteProduct(parseInt(pid));
     if (deletedProduct === -1) {
-      res
-        .status(404)
-        .send({ status: "error", error: "Producto no encontrado" });
+      res.status(404).json({ error: "Producto no encontrado" });
       return;
     }
-    res.status(201).send({ status: "success", payload: deletedProduct });
+    res.status(201).json("Producto borrado");
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al borrar el producto" });
+    res.status(500).json({ error: "Error al borrar el producto" });
   }
 });
 

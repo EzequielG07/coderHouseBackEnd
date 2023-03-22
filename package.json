@@ -1,5 +1,5 @@
 {
-  "name": "entregable3",
+  "name": "entregable4",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -13,7 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
+    "express-handlebars": "^7.0.2",
     "fs": "^0.0.1-security",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "socket.io": "^4.6.1"
   }
 }

@@ -1,3 +1,4 @@
+// const fs = require('fs');
 import fs from "fs";
 
 // Clase ProductManager para manejar los productos del archivo JSON (productos.json)
@@ -11,10 +12,10 @@ class ProductManager {
   async addProduct(product) {
     const products = await this.getProducts();
 
-    if (products.some((p) => p.code === product.code)) {
-      console.log("Error: El código del producto ya existe");
-      return -1;
-    }
+    // if (products.some((p) => p.code === product.code)) {
+    //     console.log('Error: El código del producto ya existe');
+    //     return -1;
+    // }
 
     const lastProduct = products[products.length - 1];
     const newId = lastProduct ? lastProduct.id + 1 : 1;

@@ -3,8 +3,10 @@ import fs from "fs";
 // importamos el ProductManager para poder usar sus métodos en este archivo (addProductToCart)
 import ProductManager from "./ProductManager.js";
 
+import { __dirname } from "./utils/dirname.js";
+
 // creamos una instancia de ProductManager para poder usar sus métodos en este archivo (addProductToCart)
-const productManager = new ProductManager("./productos.json");
+const productManager = new ProductManager(__dirname + "./productos.json");
 
 // creamos la clase CartManager para poder usar sus métodos (addCart, getCartById, addProductToCart)
 class CartManager {
@@ -13,13 +15,18 @@ class CartManager {
   }
 
   // método para agregar un carrito vacío a la lista de carritos (carts) del archivo JSON (carrito.json)
-  async addCart() {
+  async addCart(cart) {
     const carts = await this.#getCarts();
 
     const lastCart = carts[carts.length - 1];
     const newId = lastCart ? lastCart.id + 1 : 1;
     const newCart = {
-      products: [],
+      products: [
+        // {
+        //     pid: cart.products[0].pid,
+        //     quantity: cart.products[0].quantity || 1
+        // }
+      ],
       id: newId,
     };
     carts.push(newCart);

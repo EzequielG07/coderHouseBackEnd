@@ -1,11 +1,12 @@
 import { Router } from "express";
 import CartManager from "../CartManager.js";
+import { __dirname } from "../utils/dirname.js";
 
 // Creamos un router para poder usar los endpoints de la API de carritos (REST)
 const router = Router();
 
 // Creamos una instancia del manejador de carritos para poder usarla en los endpoints de la API de carritos (REST)
-const cartManager = new CartManager("./carrito.json");
+const cartManager = new CartManager(__dirname + "/carrito.json");
 
 // Endpoint para obtener un carrito por su id (cid) de la lista de carritos (carts) del archivo JSON (carrito.json)
 router.get("/:cid", async (req, res) => {
@@ -15,29 +16,26 @@ router.get("/:cid", async (req, res) => {
     const cart = await cartManager.getCartById(parseInt(cid));
 
     if (cart) {
-      res.status(200).send({ status: "success", payload: cart });
+      res.json(cart);
     } else {
-      res.status(404).send({ status: "error", error: "Carrito no encontrado" });
+      res.status(404).json({ error: "Carrito no encontrado" });
     }
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al obtener el carrito" });
+    res.status(500).json({ error: "Error al obtener el carrito" });
   }
 });
 
 // Endpoint para agregar un carrito vacío a la lista de carritos (carts) del archivo JSON (carrito.json)
 router.post("/", async (req, res) => {
   try {
-    const cart = await cartManager.addCart();
+    const cart = req.body;
+    await cartManager.addCart(cart);
 
-    res.status(201).send({ status: "success", payload: cart });
+    res.status(201).json("Carrito agregado");
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .send({ status: "error", error: "Error al agregar el carrito" });
+    res.status(500).json({ error: "Error al agregar el carrito" });
   }
 });
 
@@ -52,18 +50,13 @@ router.post("/:cid/product/:pid", async (req, res) => {
     );
 
     if (cart) {
-      res.status(201).send({ status: "success", payload: cart });
+      res.json(cart);
     } else {
-      res
-        .status(404)
-        .send({ status: "error", error: "Carrito o producto no encontrado" });
+      res.status(404).json({ error: "Carrito o producto no encontrado" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send({
-      status: "error",
-      error: "Error al agregar el producto al carrito",
-    });
+    res.status(500).json({ error: "Error al agregar el producto al carrito" });
   }
 });
 
