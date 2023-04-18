@@ -1,49 +1,161 @@
-const socket = io();
+const socket = io()
 
-socket.on('message0', (data) => {
-    console.log(data);
-});
+const btnSend = document.getElementById("send-message");
+const message = document.getElementById("message-area");
+const boxMessages = document.getElementById("chat-box");
+const tituloUsuario = document.getElementById('nombre-to-name')
+const divChat = document.getElementById('chat')
 
-socket.on('message1', (data) => {
-    console.log(data);
-});
+let usuario
 
-socket.on('message2', (data) => {
-    console.log(data);
-});
+// ingreso al chat - colocar el usuario
+Swal.fire({
+    title: 'BIENVENIDO',
+    text: 'Ingresa tu usuario',
+    input: 'text',
+    inputValidator: (value) => {
+        if (!value) {
+            return 'Necesitas ingresar un usuario'
+        }
+    },
+}).then((username) => {
+    usuario = username.value
+    tituloUsuario.innerText = `Bienvenido ${usuario} al Chat Grupal`
+    // evento del username ingresado
+    socket.emit('usuarioNuevo', usuario)
+    // inputMensaje.value = ''
+})
 
-socket.on('message3', (data) => {
-    console.log(data);
-});
-
-socket.on('message4', (data) => {
-    console.log(data);
-});
-
-const form = document.querySelector('#create-product-form');
-form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const name = document.querySelector('#product-title').value;
-    const price = document.querySelector('#product-price').value;
-    socket.emit('createProduct', product = { title:name, price });
-    form.reset();
-});
-
-socket.on('product-list', (products) => {
-
-    const productTable = document.querySelector('#product-table tbody');
-    productTable.innerHTML = '';
-    products.forEach((product) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${product.title}</td><td>$${product.price}</td><td><button class="delete-product" data-id="${product.id}">Borrar</button></td>`;
-        productTable.appendChild(tr);
-    });
-});
-
-const productTable = document.querySelector('#product-table tbody');
-productTable.addEventListener('click', (event) => {
-    if (event.target.classList.contains('delete-product')) {
-        const id = event.target.dataset.id;
-        socket.emit('deleteProduct', parseInt(id));
+btnSend.addEventListener("click", () => {
+    if (message.value == "") {
+        message.focus();
+    } else {
+        boxMessages.innerHTML += `
+      <!-- MI MENSAJE -->
+  <div class="chat from-message">
+    <div class="detalles">
+        <span>Tú</span>
+      <p>${message.value}</p>
+    </div>
+  </div>
+      `;
+        scrollBottom();
+        socket.emit("message", { user: usuario, msg: message.value });
+        message.value = null;
     }
 });
+
+
+// Chat Anterior
+socket.on('chat', (mensajes) => {
+    console.log(mensajes)
+
+    const chatParrafo = mensajes
+        .map((obj) => {
+            return `<p>${obj.user}: ${obj.message}</p>`
+        })
+        .join(' ')
+
+    divChat.innerHTML = chatParrafo
+})
+
+
+/* ENTER KEY  */
+function enterkey() {
+    keyenter = event.keyCode;
+    if (keyenter == 13) {
+        btnSend.click();
+        scrollBottom();
+    }
+}
+window.onkeydown = enterkey;
+
+function scrollBottom() {
+    boxMessages.scrollTop = boxMessages.scrollHeight;
+}
+
+/* LISTENER SOCKET */
+socket.on("message", (data) => {
+    boxMessages.innerHTML += `
+  <!-- MENSAJE AMIGO -->
+  <div class="chat to-message">
+    <div class="detalles">
+        <span>${data.user}</span>
+      <p>${data.msg}</p>
+    </div>
+  </div>
+  `;
+    scrollBottom()
+});
+
+// notificacion usuario nuevo conectado
+socket.on('broadcast', usuario => {
+    Toastify({
+        text: `${usuario} conectado al chat`,
+        duration: 5000,
+        position: "right", // `left`, `center` or `right`
+        style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+    }).showToast();
+})
+
+// const tituloUsuario = document.getElementById('usuario')
+// const formulario = document.getElementById('formulario')
+// const inputMensaje = document.getElementById('mensaje')
+// const divChat = document.getElementById('chat')
+
+// let usuario
+
+// // ingreso al chat - colocar el usuario
+// Swal.fire({
+//     title: 'BIENVENIDO',
+//     text: 'Ingresa tu usuario',
+//     input: 'text',
+//     inputValidator: (value) => {
+//         if (!value) {
+//             return 'Necesitas ingresar un usuario'
+//         }
+//     },
+// }).then((username) => {
+//     usuario = username.value
+//     tituloUsuario.innerText = `Hola ${usuario}`
+//     // evento del username ingresado
+//     socketClient.emit('usuarioNuevo', usuario)
+//     inputMensaje.value = ''
+// })
+
+// // mensajes
+// formulario.onsubmit = (e) => {
+//     e.preventDefault()
+//     const info = {
+//         nombre: usuario,
+//         mensaje: inputMensaje.value,
+//     }
+//     socketClient.emit('mensaje', info)
+// }
+
+// // chat
+// socketClient.on('chat', (mensajes) => {
+//     console.log(mensajes)
+
+//     const chatParrafo = mensajes
+//         .map((obj) => {
+//             return `<p>${obj.nombre}: ${obj.mensaje}</p>`
+//         })
+//         .join(' ')
+
+//     divChat.innerHTML = chatParrafo
+// })
+
+// notificacion usuario nuevo conectado
+// socketClient.on('broadcast', usuario => {
+//     Toastify({
+//         text: `${usuario} conectado al chat`,
+//         duration: 5000,
+//         position: "right", // `left`, `center` or `right`
+//         style: {
+//             background: "linear-gradient(to right, #00b09b, #96c93d)",
+//         },
+//     }).showToast();
+// })

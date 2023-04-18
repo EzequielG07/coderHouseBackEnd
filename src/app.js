@@ -1,90 +1,92 @@
-import express from "express";
-import productsRouter from "./routes/products.router.js";
-import cartsRouter from "./routes/carts.router.js";
+import express from 'express';
 
-import viewsRouter from "./routes/views.router.js";
+import './db/dbConfig.js';
 
-import { __dirname } from "./utils/dirname.js";
+// importar el router de productos (products.router.js) y asignarlo a la variable productsRouter
+import productsRouter from './routes/products.router.js';
 
-import handlebars from "express-handlebars";
+// importar el router de carritos (carts.router.js) y asignarlo a la variable cartsRouter
+import cartsRouter from './routes/carts.router.js';
 
-import { Server } from "socket.io";
-import ProductManager from "./ProductManager.js";
+// importar el __dirname para poder usarlo en app.js
+import { __dirname } from './utils/dirname.js';
 
+// importar el modulo de handlebars para poder usarlo en app.js y en la carpeta views
+import handlebars from 'express-handlebars';
+
+import { Server } from 'socket.io'
+import viewsRouter from './routes/views.router.js'
+
+import { messagesModel } from './db/models/messages.model.js'
+
+//crear una aplicación express
 const app = express();
 
+//middlewares para analizar el cuerpo de la solicitud
 app.use(express.json());
 
+//parse application/x-www-form-urlencoded (para formularios HTML)
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/public", express.static(__dirname + "/public/html"));
+// los archivos estáticos (HTML, CSS, JS) se sirven desde la carpeta pública (public)
+app.use('/public', express.static(__dirname + '/public/html'));
 
-app.use(express.static(__dirname + "/public"));
+// configurar el servidor para que use la carpeta pública (public) como carpeta de archivos estáticos
+app.use(express.static(__dirname + '/public'));
 
-app.use("/api/products", productsRouter);
+// configurar el motor de plantillas (template engine) para que use handlebars
+app.engine('handlebars', handlebars.engine());
 
-app.use("/api/carts", cartsRouter);
+// configurar la carpeta de vistas (views) y el motor de plantillas (template engine) para que use handlebars
+app.set('views', __dirname + '/views');
 
-app.engine("handlebars", handlebars.engine());
+// configurar el motor de plantillas (template engine) para que use handlebars
+app.set('view engine', 'handlebars');
 
-app.set("views", __dirname + "/views");
+app.use('/views', viewsRouter)
 
-app.set("view engine", "handlebars");
+//las rutas para los endpoints de la API de productos (REST) se definen en el router de productos (products.router.js) y se asignan a la ruta /api/products
+app.use('/api/products', productsRouter);
 
-app.use("/views", viewsRouter);
+//las rutas para los endpoints de la API de carritos (REST) se definen en el router de carritos (carts.router.js) y se asignan a la ruta /api/carts
+app.use('/api/carts', cartsRouter);
 
-const PORT = 8080;
+app.set("port", process.env.PORT || 8080);
 
-const httpServer = app.listen(PORT, () => {
-  console.log(`Servidor express escuchando en el puerto ${PORT}`);
+// escuchar en el puerto 8080 y mostrar un mensaje en la consola cuando el servidor esté inicializado (listening)
+const httpServer = app.listen(app.get("port"), () => {
+    console.log('Servidor iniciado en el puerto: ', app.get("port"));
+    console.log(`http://localhost:${app.get("port")}`);
 });
 
-const io = new Server(httpServer);
 
-const productManager = new ProductManager(__dirname + "/productos.json");
+// websocket
 
-const products = await productManager.getProducts();
+const io = new Server(httpServer)
 
-io.on("connection", (socket) => {
-  console.log(`Un cliente se ha conectado ${socket.id}`);
+io.on('connection', (socket) => {
+    console.log(`Usuario conectado: ${socket.id}`)
 
-  socket.emit("message0", "Bienvenido! estas conectado con el servidor");
+    socket.on('disconnect', () => {
+        console.log(`Usuario desconectado: ${socket.id}`)
+    })
 
-  socket.broadcast.emit(
-    "message1",
-    `Un nuevo cliente se ha conectado con id: ${socket.id}`
-  );
+    socket.on("message", async (data)=>{
 
-  socket.on("createProduct", async (product) => {
-    const productsPush = products;
-    productsPush.push(product);
+        const newMessage = new messagesModel({
+            user: data.user,
+            message: data.msg,
+        });
+        await newMessage.save();
 
-    io.emit("product-list", productsPush);
+        socket.broadcast.emit("message", data)
+    })
+    
+    socket.on('usuarioNuevo', async (usuario) => {
+        socket.broadcast.emit('broadcast', usuario)
 
-    socket.broadcast.emit(
-      "message3",
-      `El cliente con id: ${socket.id} ha creado un producto nuevo`
-    );
+        const messages = await messagesModel.find();
 
-    await productManager.addProduct(product);
-  });
-
-  socket.on("deleteProduct", async (id) => {
-    const productsPush = products.filter((product) => product.id !== id);
-
-    io.emit("product-list", productsPush);
-
-    socket.broadcast.emit(
-      "message4",
-      `El cliente con id: ${socket.id} ha eliminado un producto con id: ${id}`
-    );
-
-    await productManager.deleteProduct(id);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Un cliente se ha desconectado");
-
-    io.emit("message2", `Un cliente se ha desconectado con id: ${socket.id}`);
-  });
-});
+        socket.emit('chat', messages)
+    })
+})
