@@ -1,9 +1,9 @@
-import productsMongo from '../DAL/DAOs/productsDaos/productsMongo.js'
+import businessMongo from '../DAL/DAOs/businessDaos/businessMongo.js'
 
-class ProductsService {
+class BusinessService {
     async findAll() {
         try {
-            const result = await productsMongo.findAll();
+            const result = await businessMongo.findAll();
             return result;
         } catch (error) {
             return error;
@@ -12,25 +12,25 @@ class ProductsService {
 
     async findById(id) {
         try {
-            const result = await productsMongo.findById(id);
+            const result = await businessMongo.findById(id);
             return result;
         } catch (error) {
             return error;
         }
     }
 
-    async create(products) {
+    async create(business) {
         try {
-            const result = await productsMongo.create(products);
+            const result = await businessMongo.create(business);
             return result;
         } catch (error) {
             return error;
         }
     }
 
-    async update(id, products) {
+    async update(id, business) {
         try {
-            const result = await productsMongo.update(id, products);
+            const result = await businessMongo.update(id, business);
             return result;
         } catch (error) {
             return error;
@@ -39,7 +39,7 @@ class ProductsService {
 
     async delete(id) {
         try {
-            const result = await productsMongo.delete(id);
+            const result = await businessMongo.delete(id);
             return result;
         } catch (error) {
             return error;
@@ -48,24 +48,24 @@ class ProductsService {
 
     async deleteSoft(id) {
         try {
-            const result = await productsMongo.deleteSoft(id);
+            const result = await businessMongo.deleteSoft(id);
             return result;
         } catch (error) {
             return error;
         }
     }
 
-    // async findByCategory(category) {
+    // async findByName(name) {
     //     try {
-    //         const result = await productsMongo.findByCategory(category);
+    //         const result = await businessMongo.findByName(name);
     //         return result;
     //     } catch (error) {
     //         return error;
     //     }
     // }
-
 }
 
-const productsService = new ProductsService();
+const businessService = new BusinessService();
 
-export default productsService;
+export default businessService;
+

@@ -1,29 +1,29 @@
-import { Router } from 'express';
-
-import {
-  findOneCart,
-  createCart,
-  addOneProductToCart,
-  deleteOneProductFromCart,
-  deleteAllProductsFromCart,
-  updateAllProductsFromCart,
-  updateProductQuantityFromCart,
-} from '../controllers/carts.controller.js';
+import cartsController from "../controllers/carts.controller.js";
+import { Router } from "express";
+import { verifyTokenUser } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.get('/:cid', findOneCart);
+router.get("/", cartsController.findAllCarts);
 
-router.post('/', createCart);
+router.get("/:id", cartsController.findCartsById);
 
-router.post('/:cid/product/:pid', addOneProductToCart);
+router.post("/", verifyTokenUser, cartsController.createCarts);
 
-router.delete('/:cid/product/:pid', deleteOneProductFromCart);
+router.put("/:id", cartsController.updateCarts);
 
-router.delete('/:cid', deleteAllProductsFromCart);
+router.delete("/:id", cartsController.deleteCarts);
 
-router.put('/:cid', updateAllProductsFromCart);
+router.delete("/soft/:id", cartsController.deleteSoftCarts);
 
-router.put('/:cid/product/:pid', updateProductQuantityFromCart);
+router.post("/:cid/products/:pid", verifyTokenUser, cartsController.addProductToCart);
+
+router.delete("/:cid/products/:pid", verifyTokenUser, cartsController.removeProductFromCart);
+
+router.delete("/:cid/products", verifyTokenUser, cartsController.removeAllProductsFromCart);
+
+router.put("/:cid/products/:pid", verifyTokenUser, cartsController.updateProductQuantityFromCart);
+
+router.post("/:cid/purchase", verifyTokenUser, cartsController.purchaseCart);
 
 export default router;

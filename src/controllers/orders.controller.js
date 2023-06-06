@@ -1,55 +1,55 @@
-import productsService from "../services/products.service.js";
+import ordersService from "../services/orders.service.js";
 
-class ProductsController {
-    async findAllProducts(req, res) {
+class OrdersController {
+    async findAllOrders(req, res) {
         try {
-            const result = await productsService.findAll();
+            const result = await ordersService.findAll();
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
         }
     }
 
-    async findProductsById(req, res) {
+    async findOrdersById(req, res) {
         try {
-            const result = await productsService.findById(req.params.id);
+            const result = await ordersService.findById(req.params.id);
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
         }
     }
 
-    async createProducts(req, res) {
+    async createOrders(req, res) {
         // aqui hay que hacer validaciones de los datos que vienen en el body
         try {
-            const result = await productsService.create(req.body);
+            const result = await ordersService.create(req.body);
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
         }
     }
 
-    async updateProducts(req, res) {
+    async updateOrders(req, res) {
         try {
-            const result = await productsService.update(req.params.id, req.body);
+            const result = await ordersService.update(req.params.id, req.body);
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
         }
     }
 
-    async deleteProducts(req, res) {
+    async deleteOrders(req, res) {
         try {
-            const result = await productsService.delete(req.params.id);
+            const result = await ordersService.delete(req.params.id);
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
         }
     }
 
-    async deleteSoftProducts(req, res) {
+    async deleteSoftOrders(req, res) {
         try {
-            const result = await productsService.deleteSoft(req.params.id);
+            const result = await ordersService.deleteSoft(req.params.id);
             res.status(200).json(result);
         } catch (error) {
             res.status(400).json(error);
@@ -58,6 +58,6 @@ class ProductsController {
 
 }
 
-const productsController = new ProductsController();
+const ordersController = new OrdersController();
 
-export default productsController;
+export default ordersController;

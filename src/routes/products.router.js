@@ -1,23 +1,19 @@
-import { Router } from 'express';
-
-import {
-  findAllProducts,
-  findOneProduct,
-  addOneProduct,
-  updateOneProduct,
-  deleteOneProduct,
-} from '../controllers/products.controller.js';
+import productsController from "../controllers/products.controller.js";
+import { Router } from "express";
+import { verifyTokenAdmin } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.get('/', findAllProducts);
+router.get("/", productsController.findAllProducts);
 
-router.get('/:pid', findOneProduct);
+router.get("/:id", productsController.findProductsById);
 
-router.post('/', addOneProduct);
+router.post("/", verifyTokenAdmin, productsController.createProducts);
 
-router.put('/:pid', updateOneProduct);
+router.put("/:id", verifyTokenAdmin, productsController.updateProducts);
 
-router.delete('/:pid', deleteOneProduct);
+router.delete("/:id", verifyTokenAdmin, productsController.deleteProducts);
+
+router.delete("/soft/:id", verifyTokenAdmin, productsController.deleteSoftProducts);
 
 export default router;

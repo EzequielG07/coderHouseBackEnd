@@ -1,9 +1,9 @@
-import productsMongo from '../DAL/DAOs/productsDaos/productsMongo.js'
+import ordersMongo from '../DAL/DAOs/ordersDaos/ordersMongo.js'
 
-class ProductsService {
+class OrdersService {
     async findAll() {
         try {
-            const result = await productsMongo.findAll();
+            const result = await ordersMongo.findAll();
             return result;
         } catch (error) {
             return error;
@@ -12,25 +12,25 @@ class ProductsService {
 
     async findById(id) {
         try {
-            const result = await productsMongo.findById(id);
+            const result = await ordersMongo.findById(id);
             return result;
         } catch (error) {
             return error;
         }
     }
 
-    async create(products) {
+    async create(orders) {
         try {
-            const result = await productsMongo.create(products);
+            const result = await ordersMongo.create(orders);
             return result;
         } catch (error) {
             return error;
         }
     }
 
-    async update(id, products) {
+    async update(id, orders) {
         try {
-            const result = await productsMongo.update(id, products);
+            const result = await ordersMongo.update(id, orders);
             return result;
         } catch (error) {
             return error;
@@ -39,7 +39,7 @@ class ProductsService {
 
     async delete(id) {
         try {
-            const result = await productsMongo.delete(id);
+            const result = await ordersMongo.delete(id);
             return result;
         } catch (error) {
             return error;
@@ -48,7 +48,7 @@ class ProductsService {
 
     async deleteSoft(id) {
         try {
-            const result = await productsMongo.deleteSoft(id);
+            const result = await ordersMongo.deleteSoft(id);
             return result;
         } catch (error) {
             return error;
@@ -57,7 +57,7 @@ class ProductsService {
 
     // async findByCategory(category) {
     //     try {
-    //         const result = await productsMongo.findByCategory(category);
+    //         const result = await ordersMongo.findByCategory(category);
     //         return result;
     //     } catch (error) {
     //         return error;
@@ -66,6 +66,6 @@ class ProductsService {
 
 }
 
-const productsService = new ProductsService();
+const ordersService = new OrdersService();
 
-export default productsService;
+export default ordersService;

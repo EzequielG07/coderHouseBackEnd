@@ -1,17 +1,21 @@
+import businessRouter from '../routes/business.router.js';
+import productsRouter from '../routes/products.router.js';
+import usersRouter from '../routes/users.router.js';
+import cartsRouter from '../routes/carts.router.js';
+import ordersRouter from '../routes/orders.router.js';
+
 import { Router } from 'express';
-import productsRouter from './products.router.js';
-import cartsRouter from './carts.router.js';
-import usersRouter from './users.router.js';
-import sessionRouter from './session.router.js';
 
-const router = Router();
+const apiRouter = Router();
 
-router.use('/products', productsRouter);
+apiRouter.use('/business', businessRouter);
 
-router.use('/carts', cartsRouter);
+apiRouter.use('/products', productsRouter);
 
-router.use('/users', usersRouter);
+apiRouter.use('/users', usersRouter);
 
-router.use('/session', sessionRouter);
+apiRouter.use('/carts', cartsRouter);
 
-export default router;
+apiRouter.use('/orders', ordersRouter);
+
+export default apiRouter;
