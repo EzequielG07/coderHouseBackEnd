@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "entregable9",
-=======
-  "name": "entregable8",
->>>>>>> eb0f85b0fa781a66615fd5188ce5aaceee93cce0
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -25,11 +21,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.2.1",
     "mongoose-paginate-v2": "^1.7.1",
-<<<<<<< HEAD
     "morgan": "^1.10.0",
     "winston": "^3.9.0"
-=======
-    "morgan": "^1.10.0"
->>>>>>> eb0f85b0fa781a66615fd5188ce5aaceee93cce0
   }
 }
