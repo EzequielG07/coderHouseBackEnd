@@ -1,19 +1,24 @@
+import businessRouter from '../routes/business.router.js';
+import productsRouter from '../routes/products.router.js';
+import usersRouter from '../routes/users.router.js';
+import cartsRouter from '../routes/carts.router.js';
+import ordersRouter from '../routes/orders.router.js';
+import loggerRouter from '../routes/logger.router.js';
+
 import { Router } from 'express';
-import productsRouter from './products.router.js';
-import cartsRouter from './carts.router.js';
-import usersRouter from './users.router.js';
 
+const apiRouter = Router();
 
-// Creamos un router para poder usar los endpoints de la API de carritos (REST)
-const router = Router();
+apiRouter.use('/business', businessRouter);
 
-//las rutas para los endpoints de la API de productos (REST) se definen en el router de productos (products.router.js) y se asignan a la ruta /api/products
-router.use('/products', productsRouter);
+apiRouter.use('/products', productsRouter);
 
-//las rutas para los endpoints de la API de carritos (REST) se definen en el router de carritos (carts.router.js) y se asignan a la ruta /api/carts
-router.use('/carts', cartsRouter);
+apiRouter.use('/users', usersRouter);
 
-//Ruta de usuarios
-router.use('/users', usersRouter);
+apiRouter.use('/carts', cartsRouter);
 
-export default router;
+apiRouter.use('/orders', ordersRouter);
+
+apiRouter.use('/test', loggerRouter);
+
+export default apiRouter;

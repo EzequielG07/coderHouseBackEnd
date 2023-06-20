@@ -1,24 +1,52 @@
-export const auth = async (req, res, next) => {
-    console.log(req.session)
+import { verifyToken } from "../utils/jwt.utils.js";
+
+// verificar usuario logeados
+export const verifyTokenAuth = (req, res, next) => {
     try {
-        if (req.session.logged) {
-            next();
-        } else {
-            res.redirect('/login');
+        const token = req.cookies.token;
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return res.status(401).json("Unauthorized");
         }
+        req.user = decoded;
+        next();
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(401).json("Unauthorized");
     }
 }
 
-export const isLogged = async (req, res, next) => {
+// verificar usuario logeados y que sea admin
+export const verifyTokenAdmin = (req, res, next) => {
     try {
-        if (req.session.logged) {
-            res.redirect('/profile');
-        } else {
-            next();
+        const token = req.cookies.token;
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return res.status(401).json("Unauthorized");
         }
+        if (decoded.role !== "admin") {
+            return res.status(403).json("Forbidden");
+        }
+        req.user = decoded;
+        next();
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(401).json("Unauthorized");
+    }
+}
+
+// verificar usuario logeados y que sea user
+export const verifyTokenUser = (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return res.status(401).json("Unauthorized");
+        }
+        if (decoded.role !== "user") {
+            return res.status(403).json("Forbidden");
+        }
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json("Unauthorized");
     }
 }

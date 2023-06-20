@@ -1,81 +1,25 @@
+import usersController from "../controllers/users.controller.js";
 import { Router } from "express";
-import UsersManager from "../Dao/ManagerMongo/UsersManagerMongo.js";
-import passport from 'passport';
+import { verifyTokenAuth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
-const usersManager = new UsersManager();
 
-// router.post('/register', async (req, res) => {
-//     try {
-//         const user = req.body;
-//         const newUser = await usersManager.createUser(user);
-//         if (newUser) {
-//             res.redirect('/login');
-//         } else {
-//             res.redirect('/errorRegister');
-//         }
-//     } catch (error) {
-//         res.status(400).json({ error: error.message });
-//     }
-// });
+router.get("/", usersController.findAllUsers);
 
-// register with passport
-router.post('/register', passport.authenticate('Register', {
-    successRedirect: '/login',
-    failureRedirect: '/errorRegister',
-    passReqToCallback: true,
-}));
+router.get("/:id", usersController.findUsersById);
 
-router.post('/login', async (req, res) => {
-    try {
-        const user = req.body;
-        const userLogged = await usersManager.loginUser(user);
-        if (userLogged) {
-            for (const key in user) {
-                req.session[key] = user[key];
-            }
-            req.session.userId = userLogged._id;
-            req.session.logged = true;
-            if (userLogged.email === 'adminCoder@coder.com' && userLogged.password === 'adminCod3r123') {
-                req.session.isAdmin = true;
-            } else {
-                req.session.isAdmin = false;
-                req.session.role = 'user';
-            }
-            res.redirect('/products');
-        } else {
-            res.redirect('/errorLogin');
-        }
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+router.post("/", usersController.createUsers);
 
-router.get('/logout', (req, res) => {
-    req.session.destroy((error) => {
-        if (error) {
-            console.log(error);
-        } else {
-            res.redirect('/login');
-        }
-    })
-});
+router.put("/:id", usersController.updateUsers);
 
-// Register with passport github strategy
-router.get('/github', passport.authenticate('Github', { scope: ['user:email'] }));
+router.delete("/:id", usersController.deleteUsers);
 
-// Login with passport github strategy
-router.get('/github/callback', passport.authenticate('Github', {
-    // successRedirect: '/products',
-    failureRedirect: '/errorRegister',
-}), (req, res) => {
-    req.session.email = req.user.email;
-    req.session.logged = true;
-    req.session.userId = req.user._id;
-    req.session.isAdmin = false;
-    req.session.role = 'user';
-    res.redirect('/products');
-});
+router.delete("/soft/:id", usersController.deleteSoftUsers);
 
+router.post("/login", usersController.loginUsers);
+
+router.post("/logout", usersController.logoutUsers);
+
+router.post("/current", verifyTokenAuth, usersController.currentUsers);
 
 export default router;
