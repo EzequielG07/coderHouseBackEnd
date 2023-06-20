@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import config from '../../config/config.js';
+<<<<<<< HEAD
 import { logger } from '../../utils/logger.utils.js';
+=======
+>>>>>>> eb0f85b0fa781a66615fd5188ce5aaceee93cce0
 
 const URI = config.mongo_uri;
 
@@ -12,11 +15,17 @@ const URI = config.mongo_uri;
 const connectDB = async () => {
     try {
         await mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true });
+<<<<<<< HEAD
         logger().info('MongoDB connected');
         //console.log('MongoDB connected');
     } catch (error) {
         logger().error(error);
         //console.log(error);
+=======
+        console.log('MongoDB connected');
+    } catch (error) {
+        console.log(error);
+>>>>>>> eb0f85b0fa781a66615fd5188ce5aaceee93cce0
     }
 }
 
